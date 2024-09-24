@@ -1,0 +1,102 @@
+Sub RemoveColumnsByName()
+    Dim columnsToKeep As String
+    Dim lastColumn As Integer
+    Dim i As Integer
+    Dim keepColumn As Boolean
+    Dim colName As String
+
+    ' Define which columns to keep (list column headers here)
+    columnsToKeep = "PRODUCT_SKU_NO,PRODUCT_NAME,CULTIVATOR_LICENSE_AND_NAME,LONG_DESC,SUBCATEGORY,BRAND_NAME,BC_INDIGENOUS_PRODUCT,SPECIES,STRAIN,EXTRACTION_PROCESS,GROWING_METHOD,TERPENE_1_TYPE,TERPENE_2_TYPE,TERPENE_3_TYPE"
+
+    ' Find the last used column in the first row
+    lastColumn = Cells(1, Columns.Count).End(xlToLeft).Column
+
+    ' Loop through columns from the last to the first
+    For i = lastColumn To 1 Step -1
+        ' Reset keep flag
+        keepColumn = False
+        ' Get column name from the first row
+        colName = Cells(1, i).Value
+
+        ' Check if the column name is in the list of columns to keep
+        If InStr(1, columnsToKeep, colName) > 0 Then
+            keepColumn = True
+        End If
+        
+        ' If the column is not in the list, delete it
+        If Not keepColumn Then
+            Columns(i).Delete
+        End If
+    Next i
+End Sub
+Sub ReorderColumns()
+    Dim ws As Worksheet
+    Set ws = ActiveSheet
+
+    ' Define the new order of columns (excluding blank columns)
+    Dim newOrder As Variant
+    newOrder = Array("PRODUCT_SKU_NO", "PRODUCT_NAME", "BRAND_NAME", "BC_INDIGENOUS_PRODUCT", _
+                     "SUBCATEGORY", "CULTIVATOR_LICENSE_AND_NAME", "STRAIN", "SPECIES", "EXTRACTION_PROCESS", _
+                     "GROWING_METHOD", "TERPENE_1_TYPE", "TERPENE_2_TYPE", _
+                     "TERPENE_3_TYPE", "LONG_DESC")
+
+    Dim headerRow As Integer: headerRow = 1  ' Change this if your header is not in the first row
+    Dim col As Integer, found As Range, i As Integer
+
+    ' Move each column to its new position
+    For i = LBound(newOrder) To UBound(newOrder)
+        Set found = ws.Rows(headerRow).Find(What:=newOrder(i), LookIn:=xlValues, LookAt:=xlWhole)
+        If Not found Is Nothing Then
+            If found.Column <> i + 1 Then  ' Check if column is not already in the correct position
+                found.EntireColumn.Cut
+                ws.Columns(i + 1).Insert Shift:=xlToRight
+                Application.CutCopyMode = False
+            End If
+        End If
+    Next i
+
+    MsgBox "Columns have been reordered."
+End Sub
+Sub InsertBlankColumns()
+    Dim ws As Worksheet
+    Set ws = ActiveSheet
+
+    ' Array specifying where to insert blank columns (base 1 index)
+    ' For example, after 5th and 6th columns from the left, and 10th column
+    Dim blankPositions As Variant
+    blankPositions = Array(6, 7, 11)  ' Adjust these positions according to your needs
+
+    Dim i As Integer
+    ' Insert columns in reverse order to avoid shifting issues
+    For i = UBound(blankPositions) To LBound(blankPositions) Step -1
+        ws.Columns(blankPositions(i)).Insert Shift:=xlToRight
+        ws.Cells(1, blankPositions(i)).Value = ""  ' Optionally set header of new blank column
+    Next i
+
+    MsgBox "Blank columns have been inserted."
+End Sub
+
+Sub FillEmptyCells()
+    Dim ws As Worksheet
+    Dim rng As Range
+    Dim cell As Range
+    Dim lastRow As Long
+
+    ' Set the worksheet on which the operation will be performed
+    Set ws = ThisWorkbook.Sheets("Direct_Delivery_Product_Catalog")  ' Change "Sheet1" to your actual sheet name
+
+    ' Define the range to check for empty cells; change the column letters as needed
+    ' For example, columns from M to O might contain the Terpenes types
+    Set rng = ws.Range("M1:O" & ws.Cells(ws.Rows.Count, "M").End(xlUp).Row)
+
+    ' Loop through each cell in the defined range
+    For Each cell In rng
+        If IsEmpty(cell.Value) Or cell.Value = "" Then
+            cell.Value = ""  ' Set empty cells to a blank string
+        End If
+    Next cell
+
+    MsgBox "Empty cells filled with blank strings.", vbInformation
+End Sub
+
+

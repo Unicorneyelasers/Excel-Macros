@@ -1,0 +1,37 @@
+Sub SaveAsCsvWithCRLF()
+    Dim myFile As String
+    Dim lastRow As Long, lastCol As Long
+    Dim myData As Range
+
+    ' Define the path where the CSV will be saved
+    myFile = "C:\path\to\yourfile.csv"
+    
+    ' Find the last used row and column
+    With ActiveSheet
+        lastRow = .Cells(.Rows.Count, 1).End(xlUp).Row
+        lastCol = .Cells(1, .Columns.Count).End(xlToLeft).Column
+        Set myData = .Range(.Cells(1, 1), .Cells(lastRow, lastCol))
+    End With
+    
+    ' Open a new text file
+    Open myFile For Output As #1
+    
+    ' Write data to text file with CR LF as line terminators
+    Dim r As Range, c As Range
+    Dim lineText As String
+    For Each r In myData.Rows
+        lineText = ""
+        For Each c In r.Cells
+            lineText = lineText & """" & Replace(c.Value, """", """""") & """"
+            If Not c Is r.Cells(r.Cells.Count) Then
+                lineText = lineText & ","
+            End If
+        Next c
+        ' Write the line with CR LF ending
+        Print #1, lineText
+    Next r
+    
+    ' Close the file
+    Close #1
+    MsgBox "File saved with CR LF line terminators to " & myFile
+End Sub

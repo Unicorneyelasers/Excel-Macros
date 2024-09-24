@@ -1,0 +1,28 @@
+Sub ReorderColumns()
+    Dim ws As Worksheet
+    Set ws = ActiveSheet
+
+    ' Define the new order of columns (excluding blank columns)
+    Dim newOrder As Variant
+    newOrder = Array("PRODUCT_SKU_NO", "PRODUCT_NAME", "BRAND_NAME", "BC_INDIGENOUS_PRODUCT", _
+                     "SUBCATEGORY", "CULTIVATOR_LICENSE_AND_NAME","STRAIN", "SPECIES", "EXTRACTION_PROCESS", _
+                     "GROWING_METHOD", "TERPENE_1_TYPE", "TERPENE_2_TYPE", _
+                     "TERPENE_3_TYPE", "LONG_DESC")
+
+    Dim headerRow As Integer: headerRow = 1  ' Change this if your header is not in the first row
+    Dim col As Integer, found As Range, i As Integer
+
+    ' Move each column to its new position
+    For i = LBound(newOrder) To UBound(newOrder)
+        Set found = ws.Rows(headerRow).Find(What:=newOrder(i), LookIn:=xlValues, LookAt:=xlWhole)
+        If Not found Is Nothing Then
+            If found.Column <> i + 1 Then  ' Check if column is not already in the correct position
+                found.EntireColumn.Cut
+                ws.Columns(i + 1).Insert Shift:=xlToRight
+                Application.CutCopyMode = False
+            End If
+        End If
+    Next i
+
+    MsgBox "Columns have been reordered."
+End Sub

@@ -1,0 +1,18 @@
+Sub InsertBlankColumns()
+    Dim ws As Worksheet
+    Set ws = ActiveSheet
+
+    ' Array specifying where to insert blank columns (base 1 index)
+    ' For example, after 5th and 6th columns from the left, and 10th column
+    Dim blankPositions As Variant
+    blankPositions = Array(6, 7, 11)  ' Adjust these positions according to your needs
+
+    Dim i As Integer
+    ' Insert columns in reverse order to avoid shifting issues
+    For i = UBound(blankPositions) To LBound(blankPositions) Step -1
+        ws.Columns(blankPositions(i)).Insert Shift:=xlToRight
+        ws.Cells(1, blankPositions(i)).Value = ""  ' Optionally set header of new blank column
+    Next i
+
+    MsgBox "Blank columns have been inserted."
+End Sub

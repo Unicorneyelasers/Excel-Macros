@@ -1,0 +1,6 @@
+LOAD DATA INFILE '/var/lib/mysql-files/Sheet1.csv'
+INTO TABLE cannabis_products
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 LINES;
+

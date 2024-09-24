@@ -1,0 +1,22 @@
+Sub FillEmptyCells()
+    Dim ws As Worksheet
+    Dim rng As Range
+    Dim cell As Range
+    Dim lastRow As Long
+
+    ' Set the worksheet on which the operation will be performed
+    Set ws = ThisWorkbook.Sheets("Sheet1")  ' Change "Sheet1" to your actual sheet name
+
+    ' Define the range to check for empty cells; change the column letters as needed
+    ' For example, columns from M to O might contain the Terpenes types
+    Set rng = ws.Range("M1:O" & ws.Cells(ws.Rows.Count, "M").End(xlUp).Row)
+
+    ' Loop through each cell in the defined range
+    For Each cell In rng
+        If IsEmpty(cell.Value) Or cell.Value = "" Then
+            cell.Value = ""  ' Set empty cells to a blank string
+        End If
+    Next cell
+
+    MsgBox "Empty cells filled with blank strings.", vbInformation
+End Sub
